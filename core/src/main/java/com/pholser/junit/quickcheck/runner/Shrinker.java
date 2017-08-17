@@ -84,9 +84,10 @@ class Shrinker {
                     counterexample = next;
 
                     List<ShrinkNode> shrinks = next.shrinks();
-                    if (shrinks.isEmpty())
+                    if (shrinks.isEmpty()) {
                         counterexample = counterexample.advanceToNextArg();
-                    else
+                        counterexample.shrinks().forEach(nodes::push);
+                    } else
                         shrinks.forEach(nodes::push);
                 }
 

@@ -28,12 +28,16 @@ package com.pholser.junit.quickcheck;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pholser.junit.quickcheck.generator.GenerationStatus;
+import com.pholser.junit.quickcheck.generator.Generator;
 import com.pholser.junit.quickcheck.generator.Size;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import com.pholser.junit.quickcheck.test.generator.Foo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static java.util.Collections.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -216,6 +220,47 @@ public class ShrinkingTest {
         public void shouldHold(Foo f) throws InterruptedException {
             assumeThat(f.slow(), greaterThan(Integer.MAX_VALUE / 2));
             assertThat(f.slow(), lessThan(Integer.MAX_VALUE / 2));
+        }
+    }
+
+    @Test public void shrinkingOfSubsequentParameters() {
+        assertThat(testResult(ReproduceIssue175.class), failureCountIs(2));
+        assertTrue(ReproduceIssue175.OtherGenerator.shrinkAttempted);
+    }
+
+    @RunWith(JUnitQuickcheck.class)
+    public static class ReproduceIssue175 {
+        public static class Other {}
+
+        public static class OtherGenerator extends Generator<Other> {
+            private static boolean shrinkAttempted;
+
+            public OtherGenerator() {
+                super(Other.class);
+            }
+
+            @Override public List<Other> doShrink(SourceOfRandomness random, Other larger) {
+                shrinkAttempted = true;
+                return emptyList();
+            }
+
+            @Override public Other generate(SourceOfRandomness r, GenerationStatus s) {
+                return new Other();
+            }
+        }
+
+        @Property public void shrinksInt(
+            Foo test,
+            @From(OtherGenerator.class) Other other) {
+
+            fail("Shrink me (int)!");
+        }
+
+        @Property public void shrinksOther(
+            @From(OtherGenerator.class) Other other,
+            Foo test) {
+
+            fail("Shrink me (other)!");
         }
     }
 }
