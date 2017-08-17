@@ -19,7 +19,7 @@ factorization of a positive integer `m` greater than 1 and not equal to
 `n`.
 
 Rather than testing such properties for all possible inputs, junit-quickcheck
-and other QuickCheck kin generate some number of random inputs, and verify
+and other QuickChecks generate some number of random inputs, and verify
 that the properties hold at least for the generated inputs. This gives us
 some reasonable assurance over time that the properties hold true for any
 valid inputs.
