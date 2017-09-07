@@ -27,19 +27,23 @@ package com.pholser.junit.quickcheck.runner.sampling;
 
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import com.pholser.junit.quickcheck.internal.ParameterSampler;
 import com.pholser.junit.quickcheck.internal.SeededValue;
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import static java.util.stream.Collectors.*;
 
 public class TupleParameterSampler implements ParameterSampler {
     private final int trials;
+    private final SourceOfRandomness random;
 
     public TupleParameterSampler(int trials) {
         this.trials = trials;
+        this.random = new SourceOfRandomness(new Random());
     }
 
     @Override public int sizeFactor(Parameter p) {
@@ -55,5 +59,10 @@ public class TupleParameterSampler implements ParameterSampler {
                     .map(SeededValue::new)
                     .collect(toList()));
         return tupleStream.limit(trials);
+    }
+
+    @Override
+    public SourceOfRandomness random() {
+        return this.random;
     }
 }

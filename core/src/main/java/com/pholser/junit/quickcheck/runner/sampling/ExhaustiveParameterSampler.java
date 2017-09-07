@@ -28,6 +28,7 @@ package com.pholser.junit.quickcheck.runner.sampling;
 import java.lang.reflect.Parameter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -35,14 +36,17 @@ import com.pholser.junit.quickcheck.internal.CartesianIterator;
 import com.pholser.junit.quickcheck.internal.ParameterSampler;
 import com.pholser.junit.quickcheck.internal.SeededValue;
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import static java.util.stream.Collectors.*;
 
 public class ExhaustiveParameterSampler implements ParameterSampler {
     private final int sizeFactor;
+    private final SourceOfRandomness random;
 
     public ExhaustiveParameterSampler(int sizeFactor) {
         this.sizeFactor = sizeFactor;
+        this.random = new SourceOfRandomness(new Random());
     }
 
     @Override public int sizeFactor(Parameter p) {
@@ -62,6 +66,11 @@ public class ExhaustiveParameterSampler implements ParameterSampler {
                 .collect(toList());
 
         return cartesian(sources);
+    }
+
+    @Override
+    public SourceOfRandomness random() {
+        return this.random;
     }
 
     private <T> Stream<List<T>> cartesian(List<Iterator<T>> sources) {

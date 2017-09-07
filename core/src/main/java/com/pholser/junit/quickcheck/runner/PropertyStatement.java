@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import com.pholser.junit.quickcheck.Property;
@@ -44,7 +43,6 @@ import com.pholser.junit.quickcheck.internal.SeededValue;
 import com.pholser.junit.quickcheck.internal.ShrinkControl;
 import com.pholser.junit.quickcheck.internal.generator.GeneratorRepository;
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import com.pholser.junit.quickcheck.runner.sampling.ExhaustiveParameterSampler;
 import com.pholser.junit.quickcheck.runner.sampling.TupleParameterSampler;
 import org.junit.AssumptionViolatedException;
@@ -96,7 +94,7 @@ class PropertyStatement extends Statement {
                     p,
                     repo,
                     distro,
-                    new SourceOfRandomness(new Random())
+                    sampler.random()
                 ))
                 .collect(toList());
 

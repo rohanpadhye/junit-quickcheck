@@ -30,10 +30,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 public interface ParameterSampler {
     int sizeFactor(Parameter p);
 
     Stream<List<SeededValue>> sample(
         List<PropertyParameterGenerationContext> parameters);
+
+    SourceOfRandomness random();
 }

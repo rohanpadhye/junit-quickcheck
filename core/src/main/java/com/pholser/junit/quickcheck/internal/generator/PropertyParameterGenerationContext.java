@@ -27,6 +27,7 @@ package com.pholser.junit.quickcheck.internal.generator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.pholser.junit.quickcheck.generator.Generator;
 import com.pholser.junit.quickcheck.internal.GeometricDistribution;
@@ -63,8 +64,10 @@ public class PropertyParameterGenerationContext extends AbstractGenerationStatus
         PropertyParameterContext p,
         SourceOfRandomness r) {
 
-        if (p.fixedSeed())
+        if (p.fixedSeed()) {
+            r = new SourceOfRandomness(new Random());
             r.setSeed(p.seed());
+        }
 
         return r;
     }
