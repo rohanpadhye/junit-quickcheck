@@ -27,6 +27,7 @@ package com.pholser.junit.quickcheck;
 
 import com.pholser.junit.quickcheck.internal.ParameterSampler;
 import com.pholser.junit.quickcheck.runner.sampling.ExhaustiveParameterSampler;
+import com.pholser.junit.quickcheck.runner.sampling.GuidedParameterSampler;
 import com.pholser.junit.quickcheck.runner.sampling.TupleParameterSampler;
 
 /**
@@ -53,7 +54,19 @@ public enum Mode {
         @Override ParameterSampler sampler(int defaultSampleSize) {
             return new ExhaustiveParameterSampler(defaultSampleSize);
         }
+    },
+
+    /**
+     * Generate {@link Property#trials()} tuples of arguments for a property's
+     * parameters, using a file-backed source of randomness.
+     */
+    GUIDED {
+        @Override ParameterSampler sampler(int defaultSampleSize) {
+            return new GuidedParameterSampler(defaultSampleSize);
+        }
     };
+
+
 
     abstract ParameterSampler sampler(int defaultSampleSize);
 }

@@ -44,6 +44,7 @@ import com.pholser.junit.quickcheck.internal.ShrinkControl;
 import com.pholser.junit.quickcheck.internal.generator.GeneratorRepository;
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
 import com.pholser.junit.quickcheck.runner.sampling.ExhaustiveParameterSampler;
+import com.pholser.junit.quickcheck.runner.sampling.GuidedParameterSampler;
 import com.pholser.junit.quickcheck.runner.sampling.TupleParameterSampler;
 import org.junit.AssumptionViolatedException;
 import org.junit.runners.model.FrameworkMethod;
@@ -180,6 +181,11 @@ class PropertyStatement extends Statement {
                 return new TupleParameterSampler(marker.trials());
             case EXHAUSTIVE:
                 return new ExhaustiveParameterSampler(marker.trials());
+            case GUIDED:
+                if (marker.shrink()) {
+                    throw new IllegalArgumentException("shrink=false must be set for guided sampling");
+                }
+                return new GuidedParameterSampler(marker.trials());
         }
 
         throw new AssertionError("Don't recognize mode " + marker.mode());
