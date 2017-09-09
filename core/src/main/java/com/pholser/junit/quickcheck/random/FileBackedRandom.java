@@ -34,6 +34,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Random;
 
+import com.pholser.junit.quickcheck.guided.GuidanceIOException;
+
 /**
  * This class extends {@link java.util.Random} to act as a generator of
  * "random" values, which themselves are read from a static file.
@@ -57,14 +59,14 @@ import java.util.Random;
  * The backing file may be re-opened after closing, and this is in fact
  * the intended usage of this class. A common pattern of usage would be:
  * <code>
- *     FileBackedRandom r = new FileBackedRandom(guidance.inputFile());
+ *     FileBackedRandom r = new FileBackedRandom(guided.inputFile());
  *     for(int i = 0; i < numTrials; i++) {
- *         guidance.waitForInput();
+ *         guided.waitForInput();
  *         r.open();
  *         // Run the program under test using `r` as the source of
  *         //   randomness.
- *         r.close();
- *         guidance.notifyEndOfRun();
+ *         r.close();ø
+ *         guided.notifyEndOfRun();
  *     }
  * </code>
  *
@@ -91,7 +93,7 @@ public class FileBackedRandom extends Random {
     /**
      * Opens the source file of the backed random number generator.
      *
-     * @throws FileRandomException  if an IOException occurs
+     * @throws GuidanceIOException  if an IOException occurs
      */
     public synchronized void open() {
         if (inputStream != null) {
@@ -102,7 +104,7 @@ public class FileBackedRandom extends Random {
             // Open the backing file source as a buffered input stream
             inputStream = new BufferedInputStream(new FileInputStream(source));
         } catch (IOException e) {
-            throw new FileRandomException(e);
+            throw new GuidanceIOException(e);
         }
     }
 
@@ -142,7 +144,7 @@ public class FileBackedRandom extends Random {
             // Read up to 4 bytes from the backing source
             int bytesRead = inputStream.read(byteBuffer.array(), 0, 4);
         } catch (IOException e) {
-            throw new FileRandomException(e);
+            throw new GuidanceIOException(e);
         }
 
         // Interpret the bytes read as an integer
@@ -157,7 +159,7 @@ public class FileBackedRandom extends Random {
     /**
      * Closes the source file of the backed random number generator.
      *
-     * @throws FileRandomException  if an IOException occurs
+     * @throws GuidanceIOException  if an IOException occurs
      */
     public void close() {
         try {
@@ -167,15 +169,8 @@ public class FileBackedRandom extends Random {
                 inputStream = null;
             }
         } catch (IOException e) {
-            throw new FileRandomException(e);
+            throw new GuidanceIOException(e);
         }
     }
 
-
-
-    public static class FileRandomException extends RuntimeException {
-        public FileRandomException(IOException e) {
-            super(e);
-        }
-    }
 }

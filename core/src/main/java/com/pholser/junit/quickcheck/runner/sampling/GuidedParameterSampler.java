@@ -25,11 +25,13 @@
 
 package com.pholser.junit.quickcheck.runner.sampling;
 
-import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.pholser.junit.quickcheck.guided.GuidanceIOException;
+import com.pholser.junit.quickcheck.guided.GuidanceManager;
 import com.pholser.junit.quickcheck.internal.ParameterSampler;
 import com.pholser.junit.quickcheck.internal.SeededValue;
 import com.pholser.junit.quickcheck.internal.generator.PropertyParameterGenerationContext;
@@ -45,7 +47,7 @@ public class GuidedParameterSampler implements ParameterSampler {
 
     public GuidedParameterSampler(int trials) {
         this.trials = trials;
-        this.randomFile = new FileBackedRandom(new File("/dev/urandom"));
+        this.randomFile = new FileBackedRandom(GuidanceManager.getGuidance().inputFile());
         this.random = new SourceOfRandomness(randomFile);
     }
 
@@ -58,6 +60,14 @@ public class GuidedParameterSampler implements ParameterSampler {
 
         Stream<List<SeededValue>> tupleStream =
                 Stream.generate(() -> {
+                    // Block until guided is ready
+                    try {
+                        GuidanceManager.getGuidance().waitForInput();
+                    } catch (IOException e) {
+                        throw new GuidanceIOException(e);
+                    }
+
+                    // Read input from random file
                     randomFile.open();
                     List<SeededValue> seededValues =
                             parameters.stream()
