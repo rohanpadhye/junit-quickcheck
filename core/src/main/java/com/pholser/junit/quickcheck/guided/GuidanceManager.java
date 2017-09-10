@@ -24,6 +24,7 @@
 */
 package com.pholser.junit.quickcheck.guided;
 
+import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Request;
 
@@ -62,8 +63,10 @@ public class GuidanceManager {
 
         // Run the test until it ends or throws
         try {
-            new JUnitCore().run(testRequest);
-            System.err.println("Guided Quickcheck completed successfully.");
+            JUnitCore junit = new JUnitCore();
+            junit.addListener(new TextListener(System.out));
+            junit.run(testRequest);
+            System.out.println("Guided Quickcheck completed successfully.");
         } catch (GuidanceIOException e) {
             System.err.println("Guided Quickcheck terminated.");
             e.getCause().printStackTrace();
